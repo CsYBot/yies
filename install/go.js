@@ -15,22 +15,13 @@ async function start() {
     if(!LICENSE) return util.send("LICENSE PROBLEM V1", "red");
     let keycontrols = await axios.get("https://raw.githubusercontent.com/CsYBot/yies/main/server").catch(err => stop = true && util.send("LICENSE SERVER PROBLEM", "red"));
     if(stop) return;
-    let keycontrol = await axios.get((String(keycontrols.data)).replaceAll("\n", ""), {
-        headers: {
-            Authorization: LICENSE
-        }
-    }).catch(err => stop = true && util.send("LICENSE MAIN SERVER PROBLEM", "red"));
-    if(stop) return;
-
-    if(!keycontrol || !keycontrol.data || typeof keycontrol.data !== "object" || !keycontrol.data.download) return util.send("LICENSE BROKEN!", "red");
-
     util.send("Yükleniyor..", "green");
     try {
-        const source = `${String(keycontrol.data.download)}`;
+        const source = `${String(keycontrols.data).replaceAll("\n", "")}`;
         
-        request.get(source).on('error', function(error) {
+        request.get(source).set({'Authorization': LICENSE}).on('error', function(error) {
             error + "1";
-            util.send("Max Deneme Ulaştın!", "red")
+            util.send("LICENSE MAIN SERVER PROBLEM", "red")
         }).pipe(fs.createWriteStream("downloading.zip")).on('finish', function() {
             util.send("Başarıyla Yüklenildi!", "green");
         });
@@ -47,7 +38,7 @@ async function start() {
         fs.writeFileSync(path.join(__dirname, "../completed"), "completed");
     } catch (err) {
         err + "1";
-        util.send("DOWNLOADING LICENSE MAIN SERVER PROBLEM", "red")
+        util.send("LICENSE BROKEN", "red")
     }
 };
 start();

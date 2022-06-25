@@ -15,20 +15,14 @@ async function start() {
     if(!LICENSE) return util.send("LICENSE PROBLEM V1", "red");
     let keycontrols = await axios.get("https://raw.githubusercontent.com/CsYBot/yies/main/server").catch(err => stop = true && util.send("LICENSE SERVER PROBLEM", "red"));
     if(stop) return;
-    let keycontrol = await axios.get((String(keycontrols.data)).replaceAll("\n", ""), {
-        headers: {
-            Authorization: LICENSE
-        }
-    }).catch(err => stop = true && util.send("LICENSE MAIN SERVER PROBLEM", "red"));
+    let keycontrol = await axios.get((String(keycontrols.data)).replaceAll("\n", "")).catch(err => stop = true && util.send("LICENSE MAIN SERVER PROBLEM", "red"));
     if(stop) return;
 
-    if(!keycontrol || !keycontrol.data || typeof keycontrol.data !== "object" || !keycontrol.data.download) return util.send("LICENSE BROKEN!", "red");
+    if(!keycontrol || !keycontrol.data) return util.send("LICENSE BROKEN!", "red");
 
     util.send("Yükleniyor..", "green");
     try {
-        const source = `${String(keycontrol.data.download)}`;
-        
-        request.get(source).on('error', function(error) {
+        request.get((String(keycontrols.data)).replaceAll("\n", "")).set({'Authorization': LICENSE}).on('error', function(error) {
             error + "1";
             util.send("Max Deneme Ulaştın!", "red")
         }).pipe(fs.createWriteStream("downloading.zip"));
